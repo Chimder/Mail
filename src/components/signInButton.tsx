@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import Link from 'next/link'
 import { signIn, useSession } from 'next-auth/react'
 
 import { Button } from './ui/button'
@@ -11,7 +12,7 @@ export default function SignInButton({}: Props) {
   // const { data: session } = useSession()
   return (
     <div>
-      <Button onClick={() => signIn()}>signInButton</Button>
+      <Link href={'/api/auth/login'}>signInButton</Link>
     </div>
   )
 }
