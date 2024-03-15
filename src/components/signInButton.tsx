@@ -2,9 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { signIn, useSession } from 'next-auth/react'
-
-import { Button } from './ui/button'
+import { redirects } from '@/shared/lib/constants'
 
 type Props = {}
 
@@ -12,7 +10,7 @@ export default function SignInButton({}: Props) {
   // const { data: session } = useSession()
   return (
     <div>
-      <Link href={'/api/auth/login'}>signInButton</Link>
+      <Link href={redirects.toGoogleLogin}>signInButton</Link>
     </div>
   )
 }

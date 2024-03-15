@@ -1,38 +1,16 @@
 import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
-// import { Account, PrismaClient, User } from '@prisma/client'
 import axios from 'axios'
 import { v4 as uuidv4 } from 'uuid'
 
-import { decrypt, encrypt } from '@/lib/auth/actions'
+import { decrypt, encrypt } from '../_auth/options'
+import { Account, MainSession, User } from '../_auth/types'
 
-// const prisma = new PrismaClient()
-export interface MainSession {
-  user: User
-  expires: number
-  iat: number
-}
-type User = {
-  id: string
-  accounts: Account[]
-}
-
-type Account = {
-  name: string
-  picture: string
-  providerId: string
-  providerAccountId: string
-  email: string
-  accessToken: string
-  refreshToken: string
-  userId: string
-}
-
-export async function GET(req: NextRequest, res: NextResponse) {
+export async function GET(req: NextRequest) {
   if (req.method === 'GET') {
     console.log('REQURL', req.nextUrl.origin)
     const code = req.nextUrl.searchParams.get('code') as string
-    const redirect_uri = 'http://localhost:3000/api/auth/callback'
+    const redirect_uri = 'http://localhost:3000/google/callback'
     const response = await axios.post('https://oauth2.googleapis.com/token', {
       code,
       client_id: process.env.GOOGLE_CLIENT_ID,
