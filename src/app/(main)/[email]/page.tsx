@@ -6,10 +6,10 @@ import { getSession } from '@/app/(auth)/google/_auth/options'
 
 type Props = {}
 
-export default async function Testt({ params }: { params: { email: string; mail: string } }) {
+export default async function Testt({ params }: { params: { email: string } }) {
   const session = await getSession()
-  const mail = decodeURIComponent(params?.email[0])
-  console.log(params)
+  const mail = decodeURIComponent(params?.email)
+  console.log(params.email)
 
   return (
     <>

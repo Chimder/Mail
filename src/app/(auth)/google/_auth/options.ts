@@ -3,6 +3,7 @@
 import { cookies } from 'next/headers'
 import { google } from 'googleapis'
 import { jwtVerify, SignJWT } from 'jose'
+
 import { MainSession } from './types'
 
 const secretKey = process.env.NEXT_AUTH_SECRET
@@ -39,11 +40,14 @@ export async function getMessages(accessToken: string, refreshToken: string) {
   })
 
   const gmail = google.gmail({ version: 'v1', auth: oauth2Client })
-  const { data } = await gmail.users.messages.list({ userId: 'me' })
+  const { data } = await gmail.users.messages.list({ userId: 'me', maxResults: 10 })
+
+  console.log(data)
+
+  // const  dataMess  = await gmail.users.messages.get({ userId: 'me', id: messageId })
 
   return data
 }
-
 
 export async function getMessage(accessToken: string, refreshToken: string, messageId: string) {
   if (!accessToken || !refreshToken) {
@@ -63,4 +67,35 @@ export async function getMessage(accessToken: string, refreshToken: string, mess
   const { data } = await gmail.users.messages.get({ userId: 'me', id: messageId })
 
   return data
+}
+
+export async function getMessagesAndContent(accessToken: string, refreshToken: string) {
+  if (!accessToken || !refreshToken) {
+    throw new Error('Account not found')
+  }
+
+  const oauth2Client = new google.auth.OAuth2(
+    process.env.GOOGLE_CLIENT_ID,
+    process.env.GOOGLE_CLIENT_SECRET,
+  )
+  oauth2Client.setCredentials({
+    access_token: accessToken,
+    refresh_token: refreshToken,
+  })
+
+  const gmail = google.gmail({ version: 'v1', auth: oauth2Client })
+  const { data } = await gmail.users.messages.list({ userId: 'me', maxResults: 70 })
+
+  if (!data.messages) {
+    return []
+  }
+
+  const messages = await Promise.allSettled(
+    data.messages.map(async (message: any) => {
+      const fullMessage = gmail.users?.messages.get({ userId: 'me', id: message.id })
+      return fullMessage
+    }),
+  )
+  // console.log('MESSFUNC', messages)
+  return messages
 }
