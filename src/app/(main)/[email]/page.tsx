@@ -18,7 +18,6 @@ export default async function Testt({ params }: { params: { email: string } }) {
         <Gmail mail={acc} />
         /* </Link> */
       ))}
-      <div>{mail}</div>
     </>
   )
 }
