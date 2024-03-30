@@ -2,6 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
+::-webkit-scrollbar {
+  width: 4px; /* Ширина полосы прокрутки */
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Цвет фона */
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(223, 221, 221, 0.3); /* Цвет ползунка с прозрачностью */
+  border-radius: 300px; /* Закругление краев ползунка */
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888; /* Цвет ползунка */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(112, 111, 111, 0.5);
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;

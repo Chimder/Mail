@@ -1,23 +1,20 @@
 import React from 'react'
-import Link from 'next/link'
-
 import Gmail from '@/components/gmail'
 import { getSession } from '@/app/(auth)/google/_auth/options'
 
-type Props = {}
 
-export default async function Testt({ params }: { params: { email: string } }) {
+export default async function Email({ params }: { params: { email: string } }) {
   const session = await getSession()
   const mail = decodeURIComponent(params?.email)
-  console.log(params.email)
+  const gmailAccount = session?.user.accounts.find(acc => acc.email === mail)
 
+  if (!gmailAccount) {
+    return <>gmail Not Found</>
+  }
   return (
-    <>
-      {session?.user.accounts.map(acc => (
-        // <Link href={`/gmail/${acc.providerAccountId}`}>
-        <Gmail mail={acc} />
-        /* </Link> */
-      ))}
-    </>
+    <section className="overflow-x-hidden">
+      <div></div>
+      {gmailAccount && <Gmail mail={gmailAccount} />}
+    </section>
   )
 }

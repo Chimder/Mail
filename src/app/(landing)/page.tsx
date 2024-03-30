@@ -9,8 +9,8 @@ export default async function Home() {
           Get started by editing&nbsp;
         </p>
       </div>
-      <SignInButton></SignInButton>
-      <Test />
+      {/* <SignInButton></SignInButton>
+      <Test /> */}
     </main>
   )
 }

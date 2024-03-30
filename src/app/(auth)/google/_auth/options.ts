@@ -48,9 +48,41 @@ export async function getMessagesAndContent(accessToken: string, refreshToken: s
 
   const messages = await Promise.allSettled(
     data.messages.map(async (message: any) => {
-      const fullMessage = gmail.users?.messages.get({ userId: 'me', id: message.id })
+      const fullMessage = await gmail.users?.messages.get({ userId: 'me', id: message.id })
       return fullMessage
     }),
   )
-  return messages
+
+  const messagesData = messages.map((message: any) => {
+    const headers = message.value?.data?.payload?.headers
+    const subjectHeader = headers.find((header: any) => header.name === 'Subject')
+    const fromHeader = headers.find((header: any) => header.name === 'From')
+    const toHeader = headers.find((header: any) => header.name === 'To')
+    const dateHeader = headers.find((header: any) => header.name === 'Date')
+
+    const subject = subjectHeader ? subjectHeader.value : ''
+    const from = fromHeader ? fromHeader.value : ''
+    const to = toHeader ? toHeader.value : ''
+    const date = dateHeader ? dateHeader.value : ''
+    const snippet = message.value?.data?.snippet
+    const isUnread = message.value?.data?.labelIds.includes('UNREAD')
+    let isBodyWithParts = false
+    let body
+
+    if (message.value?.data?.payload?.parts) {
+      body = message.value?.data?.payload?.parts[1]?.body?.data
+    } else {
+      isBodyWithParts = true
+      body = message.value?.data?.payload?.body?.data
+    }
+    if (!body) {
+      return null
+    }
+
+    const base64text = body.replace(/-/g, '+').replace(/_/g, '/')
+    const decodedText = Buffer.from(base64text, 'base64').toString('utf8')
+    const bodyData = decodedText
+    return { subject, from, to, date, snippet, isUnread, isBodyWithParts, bodyData }
+  })
+  return messagesData
 }
