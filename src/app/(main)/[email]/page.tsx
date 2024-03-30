@@ -1,7 +1,7 @@
 import React from 'react'
+
 import Gmail from '@/components/gmail'
 import { getSession } from '@/app/(auth)/google/_auth/options'
-
 
 export default async function Email({ params }: { params: { email: string } }) {
   const session = await getSession()

@@ -1,18 +1,20 @@
-// import { useState } from 'react'
+// 'use client'
+
 import { Tally1, Tally2 } from 'lucide-react'
 
 import { getMessagesAndContent } from '@/app/(auth)/google/_auth/options'
 import { Account } from '@/app/(auth)/google/_auth/types'
 
 export default async function Gmail({ mail }: { mail: Account }) {
-  // const [selectedMessage, setSelectedMessage] = useState<any>(null)
   const messagesData = await getMessagesAndContent(mail.accessToken, mail.refreshToken)
+
+  console.log('>>>>>', messagesData)
 
   return (
     <div className="flex h-[100vh] w-full overflow-x-hidden ">
       <div className="overflow-y-scroll">
-        {messagesData &&
-          messagesData?.map((mess, i) => (
+        {messagesData?.messagesData &&
+          messagesData?.messagesData?.map((mess, i) => (
             <ul
               key={`${mess?.snippet} + ${i}`}
               className="flex max-w-[600px] items-center justify-start pl-20 pt-2"
@@ -38,6 +40,7 @@ export default async function Gmail({ mail }: { mail: Account }) {
             </ul>
           ))}
       </div>
+
       {/* {selectedMessage?.isBodyWithParts ? (
         <div style={{ whiteSpace: 'pre-wrap' }}>{selectedMessage?.bodyData}</div>
       ) : selectedMessage?.bodyData ? (

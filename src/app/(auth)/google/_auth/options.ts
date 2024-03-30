@@ -6,6 +6,12 @@ import { jwtVerify, SignJWT } from 'jose'
 
 import { MainSession } from './types'
 
+// let google: any
+//
+// if (typeof window === 'undefined') {
+// google = require('googleapis').google
+// }
+
 const secretKey = process.env.NEXT_AUTH_SECRET
 const key = new TextEncoder().encode(secretKey)
 
@@ -25,7 +31,11 @@ export async function getSession(): Promise<MainSession | null> {
   return await decrypt(session)
 }
 
-export async function getMessagesAndContent(accessToken: string, refreshToken: string) {
+export async function getMessagesAndContent(
+  accessToken: string,
+  refreshToken: string,
+  pageToken?: number,
+) {
   if (!accessToken || !refreshToken) {
     throw new Error('Account not found')
   }
@@ -40,10 +50,16 @@ export async function getMessagesAndContent(accessToken: string, refreshToken: s
   })
 
   const gmail = google.gmail({ version: 'v1', auth: oauth2Client })
-  const { data } = await gmail.users.messages.list({ userId: 'me', maxResults: 20 })
+  const { data } = await gmail.users.messages.list({
+    userId: 'me',
+    maxResults: 2,
+    pageToken: pageToken?.toString(),
+  })
+
+  const nextPageToken = data.nextPageToken
 
   if (!data.messages) {
-    return []
+    return undefined
   }
 
   const messages = await Promise.allSettled(
@@ -67,6 +83,7 @@ export async function getMessagesAndContent(accessToken: string, refreshToken: s
     const snippet = message.value?.data?.snippet
     const isUnread = message.value?.data?.labelIds.includes('UNREAD')
     let isBodyWithParts = false
+
     let body
 
     if (message.value?.data?.payload?.parts) {
@@ -78,11 +95,14 @@ export async function getMessagesAndContent(accessToken: string, refreshToken: s
     if (!body) {
       return null
     }
+    // console.log('BODY', body)
 
     const base64text = body.replace(/-/g, '+').replace(/_/g, '/')
     const decodedText = Buffer.from(base64text, 'base64').toString('utf8')
     const bodyData = decodedText
+
     return { subject, from, to, date, snippet, isUnread, isBodyWithParts, bodyData }
   })
-  return messagesData
+  // console.log('ME@@@<<<<<<<', messagesData)
+  return { messagesData, nextPageToken }
 }

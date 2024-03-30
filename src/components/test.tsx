@@ -8,10 +8,10 @@ type Props = {}
 
 export async function Test(props: Props) {
   const session = await getSession()
-  console.log(
-    'MAINSES',
-    session?.user.accounts.map(acc => acc.email),
-  )
+  // console.log(
+  //   'MAINSES',
+  //   session?.user.accounts.map(acc => acc.email),
+  // )
   // const mess = await getMessages('100477167703661986822')
   // console.log('MESSS', mess)
   return (

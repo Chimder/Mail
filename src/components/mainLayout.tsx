@@ -7,10 +7,10 @@ type Props = {
   session: MainSession | null
 }
 export const MainLayout = ({ session }: Props) => {
-  console.log('SESSS', session?.user?.accounts)
+  // console.log('SESSS', session?.user?.accounts)
   return (
-    <div className="nav_bar_container">
-      <nav className="z-100 flex w-full justify-evenly">
+    <nav className="nav_bar_container">
+      <div className="z-100 flex w-full justify-evenly">
         {session?.user?.accounts.map((email, i) => (
           <Link href={`/${email.email}`} key={email.providerAccountId}>
             <img className="h-10 w-10" src={email.picture} alt="" />
@@ -18,7 +18,7 @@ export const MainLayout = ({ session }: Props) => {
           </Link>
         ))}
         {/* <ThemeToggle /> */}
-      </nav>
-    </div>
+      </div>
+    </nav>
   )
 }

@@ -8,7 +8,7 @@ import { Account, MainSession, User } from '../_auth/types'
 
 export async function GET(req: NextRequest) {
   if (req.method === 'GET') {
-    console.log('REQURL', req.nextUrl.origin)
+    // console.log('REQURL', req.nextUrl.origin)
     const code = req.nextUrl.searchParams.get('code') as string
     const redirect_uri = 'http://localhost:3000/google/callback'
     const response = await axios.post('https://oauth2.googleapis.com/token', {
@@ -29,13 +29,13 @@ export async function GET(req: NextRequest) {
     const session = cookies().get('sessionGoogle')?.value
     if (session) {
       const parsed: MainSession = await decrypt(session)
-      console.log('parsedDATA', parsed)
+      // console.log('parsedDATA', parsed)
 
       //filter acount
       const accountIndex = parsed.user.accounts.find(
         (acc: Account) => acc.providerId === 'google' && acc.providerAccountId === googleId,
       )
-      console.log('ACCINDEX', accountIndex)
+      // console.log('ACCINDEX', accountIndex)
 
       if (accountIndex) {
         //update account
