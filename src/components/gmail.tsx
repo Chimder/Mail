@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { Tally1, Tally2 } from 'lucide-react'
 
 import { getMessagesAndContent } from '@/app/(auth)/google/_auth/options'
@@ -30,18 +31,42 @@ type Mess = {
   nextPageToken: string | null | undefined
 }
 type Props = {
-  mail?: Mess
+  accountData?: any
 }
 
-export default function Gmail({ mail }: Props) {
+export default function Gmail({ accountData }: Props) {
   const [selectedMessage, setSelectedMessage] = useState<any>()
-  // console.log('>>>>>', mail)
+
+  const fetchMessPages = async ({ pageParam }: { pageParam?: number }) => {
+    const response = await getMessagesAndContent(
+      accountData?.accessToken,
+      accountData?.refreshToken,
+      pageParam,
+    )
+    return response
+  }
+  const { data: mailData } = useInfiniteQuery({
+    queryKey: ['mangas'],
+    queryFn: fetchMessPages,
+    getNextPageParam: (lastPage: any, pages, lastPageParam) => {
+      if (!lastPage?.nextPageToken) {
+        return undefined
+      }
+      return lastPage.nextPageToken
+    },
+    initialPageParam: undefined,
+    enabled: !!accountData,
+    refetchOnWindowFocus: false,
+    retry: 2,
+  })
+  const mailDatas = mailData?.pages.flatMap(page => page?.messagesData)
+  console.log('>>>>>', mailDatas)
 
   return (
     <div className="flex h-[100vh] w-full overflow-x-hidden ">
       <div className="overflow-y-scroll">
-        {mail?.messagesData &&
-          mail?.messagesData?.map((mess, i) => (
+        {mailDatas &&
+          mailDatas?.map((mess, i) => (
             <ul
               key={`${mess?.snippet} + ${i}`}
               className="flex max-w-[600px] items-center justify-start pl-20 pt-2"

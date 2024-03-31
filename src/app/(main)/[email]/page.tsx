@@ -11,17 +11,18 @@ export default async function Email({ params }: { params: { email: string } }) {
   if (!gmailAccount) {
     return <>gmail Not Found</>
   }
-  const mailData = await getMessagesAndContent(
-    gmailAccount?.accessToken,
-    gmailAccount?.refreshToken,
-  )
-  console.log(mailData?.messagesData.length)
+  // const mailData = await getMessagesAndContent(
+  //   gmailAccount?.accessToken,
+  //   gmailAccount?.refreshToken,
+  // )
+  // console.log(mailData?.messagesData.length)
 
   // console.log('DATA', mailData)
   return (
     <section className="overflow-x-hidden">
       <div></div>
-      {gmailAccount && <Gmail mail={mailData} />}
+      {/* {gmailAccount && <Gmail mail={mailData} />} */}
+      {gmailAccount && <Gmail accountData={gmailAccount} />}
     </section>
   )
 }

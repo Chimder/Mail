@@ -4,6 +4,7 @@ import { Inter } from 'next/font/google'
 import '../styles/globals.css'
 
 import { MainLayout } from '@/components/mainLayout'
+import { ClientProvider } from '@/components/providers/tanstack-provider'
 
 import { getSession } from './(auth)/google/_auth/options'
 
@@ -21,12 +22,14 @@ export default async function RootLayout({
 }>) {
   const session = await getSession()
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <div>landing layout</div>
-        <MainLayout session={session}></MainLayout>
-        {children}
-      </body>
-    </html>
+    <ClientProvider>
+      <html lang="en">
+        <body className={inter.className}>
+          <div>landing layout</div>
+          <MainLayout session={session}></MainLayout>
+          {children}
+        </body>
+      </html>
+    </ClientProvider>
   )
 }
