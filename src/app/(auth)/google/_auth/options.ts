@@ -52,8 +52,8 @@ export async function getMessagesAndContent(
   const gmail = google.gmail({ version: 'v1', auth: oauth2Client })
   const { data } = await gmail.users.messages.list({
     userId: 'me',
-    maxResults: 2,
-    pageToken: pageToken?.toString(),
+    maxResults: 100,
+    // pageToken: pageToken?.toString(),
   })
 
   const nextPageToken = data.nextPageToken
@@ -82,8 +82,8 @@ export async function getMessagesAndContent(
     const date = dateHeader ? dateHeader.value : ''
     const snippet = message.value?.data?.snippet
     const isUnread = message.value?.data?.labelIds.includes('UNREAD')
-    let isBodyWithParts = false
 
+    let isBodyWithParts = false
     let body
 
     if (message.value?.data?.payload?.parts) {
@@ -92,13 +92,12 @@ export async function getMessagesAndContent(
       isBodyWithParts = true
       body = message.value?.data?.payload?.body?.data
     }
-    if (!body) {
-      return null
-    }
-    // console.log('BODY', body)
 
-    const base64text = body.replace(/-/g, '+').replace(/_/g, '/')
-    const decodedText = Buffer.from(base64text, 'base64').toString('utf8')
+    let decodedText = ''
+    if (body) {
+      const base64text = body.replace(/-/g, '+').replace(/_/g, '/')
+      decodedText = Buffer.from(base64text, 'base64').toString('utf8')
+    }
     const bodyData = decodedText
 
     return { subject, from, to, date, snippet, isUnread, isBodyWithParts, bodyData }
