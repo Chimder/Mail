@@ -25,7 +25,6 @@ export default async function RootLayout({
     <ClientProvider>
       <html lang="en">
         <body className={inter.className}>
-          <div>landing layout</div>
           <MainLayout session={session}></MainLayout>
           {children}
         </body>

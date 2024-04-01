@@ -101,6 +101,6 @@
     @apply px-[10vw] xl:px-[3vw] lg:px-0;
   }
   .nav_bar_container {
-    @apply fixed left-1/2 top-14 z-999 flex h-full max-h-[60px] w-full max-w-[1040px] -translate-x-1/2 -translate-y-1/2 transform items-center rounded-full bg-[rgba(0,0,0,0.2)] p-2 text-lg backdrop-blur-md;
+    @apply fixed left-1/2 top-8 z-999 flex h-full max-h-[54px] w-full max-w-[920px] -translate-x-1/2 -translate-y-1/2 transform items-center rounded-full bg-[rgba(0,0,0,0.2)] p-2 text-lg backdrop-blur-md;
   }
 }

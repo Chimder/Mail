@@ -5,12 +5,7 @@ import { google } from 'googleapis'
 import { jwtVerify, SignJWT } from 'jose'
 
 import { MainSession } from './types'
-
-// let google: any
-//
-// if (typeof window === 'undefined') {
-// google = require('googleapis').google
-// }
+import { formatDate } from '@/shared/lib/data-format'
 
 const secretKey = process.env.NEXT_AUTH_SECRET
 const key = new TextEncoder().encode(secretKey)
@@ -29,6 +24,10 @@ export async function getSession(): Promise<MainSession | null> {
   const session = cookies().get('sessionGoogle')?.value
   if (!session) return null
   return await decrypt(session)
+}
+function extractName(from: string) {
+  const match = from.match(/(.*)<.*>/)
+  return match ? match[1].trim() : from
 }
 
 export async function getMessagesAndContent(
@@ -53,7 +52,7 @@ export async function getMessagesAndContent(
   const { data } = await gmail.users.messages.list({
     userId: 'me',
     maxResults: 100,
-    // pageToken: pageToken?.toString(),
+    pageToken: pageToken?.toString(),
   })
 
   const nextPageToken = data.nextPageToken
@@ -77,9 +76,11 @@ export async function getMessagesAndContent(
     const dateHeader = headers.find((header: any) => header.name === 'Date')
 
     const subject = subjectHeader ? subjectHeader.value : ''
-    const from = fromHeader ? fromHeader.value : ''
+    const from = fromHeader ? extractName(fromHeader.value) : ''
+
     const to = toHeader ? toHeader.value : ''
-    const date = dateHeader ? dateHeader.value : ''
+    // const date = dateHeader ? dateHeader.value : ''
+    const date = dateHeader ? formatDate(dateHeader.value) : ''
     const snippet = message.value?.data?.snippet
     const isUnread = message.value?.data?.labelIds.includes('UNREAD')
 
@@ -102,6 +103,5 @@ export async function getMessagesAndContent(
 
     return { subject, from, to, date, snippet, isUnread, isBodyWithParts, bodyData }
   })
-  // console.log('ME@@@<<<<<<<', messagesData)
   return { messagesData, nextPageToken }
 }

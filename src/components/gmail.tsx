@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from 'react'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
-import { Tally1, Tally2 } from 'lucide-react'
+import { RotateCw, Tally1, Tally2 } from 'lucide-react'
+import { useInView } from 'react-intersection-observer'
 
 import { getMessagesAndContent } from '@/app/(auth)/google/_auth/options'
-import { Account } from '@/app/(auth)/google/_auth/types'
 
 type Messs = {
   subject: any
@@ -45,10 +45,15 @@ export default function Gmail({ accountData }: Props) {
     )
     return response
   }
-  const { data: mailData } = useInfiniteQuery({
+  const {
+    data: mailData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
     queryKey: ['mangas'],
     queryFn: fetchMessPages,
-    getNextPageParam: (lastPage: any, pages, lastPageParam) => {
+    getNextPageParam: (lastPage: any) => {
       if (!lastPage?.nextPageToken) {
         return undefined
       }
@@ -62,44 +67,63 @@ export default function Gmail({ accountData }: Props) {
   const mailDatas = mailData?.pages.flatMap(page => page?.messagesData)
   console.log('>>>>>', mailDatas)
 
-  return (
-    <div className="flex h-[100vh] w-full overflow-x-hidden ">
-      <div className="overflow-y-scroll">
-        {mailDatas &&
-          mailDatas?.map((mess, i) => (
-            <ul
-              key={`${mess?.snippet} + ${i}`}
-              className="flex max-w-[600px] items-center justify-start pl-20 pt-2"
-              onClick={() => setSelectedMessage(mess)}
-            >
-              <li className="flex items-center justify-start divide-y divide-dashed divide-blue-200">
-                <div>
-                  {mess?.isUnread ? (
-                    <Tally2 className="h-6 w-6 pr-1 text-sky-600" />
-                  ) : (
-                    <Tally1 className="h-6 w-6 text-orange-500" />
-                  )}
-                </div>
-                <div className="">
-                  <div className="flex justify-between">
-                    <div className="flex text-base">{mess?.from}</div>
-                    <div className="text-sm text-black">{mess?.date}</div>
-                  </div>
-                  <div className="text-sm text-black/95">{mess?.subject}</div>
-                  <div className="text-sm text-black/70">{mess?.snippet}</div>
-                </div>
-              </li>
-            </ul>
-          ))}
-      </div>
+  const { ref, inView } = useInView()
+  useEffect(() => {
+    if (inView && hasNextPage) {
+      fetchNextPage()
+    }
+  }, [inView])
 
-      {selectedMessage?.isBodyWithParts ? (
-        <div key={selectedMessage?.bodyData} style={{ whiteSpace: 'pre-wrap' }}>
-          {selectedMessage?.bodyData}
+  return (
+    <div className="grid h-[100vh] grid-cols-5 bg-white">
+      <section className="col-span-2 flex flex-col items-center justify-center pl-[12vw] ">
+        <div className="flex h-[94vh] w-full flex-col items-center justify-start overflow-x-hidden overflow-y-scroll">
+          {mailDatas &&
+            mailDatas?.map((mess, i) => (
+              <ul
+                ref={ref}
+                key={`${mess?.snippet} + ${i}`}
+                className="ml-0 flex w-full justify-center !pl-0"
+                onClick={() => setSelectedMessage(mess)}
+              >
+                <li className="flex w-full items-center justify-start divide-y divide-dashed divide-blue-200">
+                  <div>
+                    {mess?.isUnread ? (
+                      <Tally2 className="h-6 w-6 pr-1 text-sky-600" />
+                    ) : (
+                      <Tally1 className="h-6 w-6 text-orange-500" />
+                    )}
+                  </div>
+                  <div className="w-full">
+                    <div className="flex justify-between">
+                      <div className="flex text-base">{mess?.from}</div>
+                      <div className="text-sm text-black">{mess?.date}</div>
+                    </div>
+                    <div className="line-clamp-1 overflow-hidden text-ellipsis text-sm text-black/95">
+                      {mess?.subject}
+                    </div>
+                    <div className="line-clamp-2 text-sm text-black/70">{mess?.snippet}</div>
+                  </div>
+                </li>
+              </ul>
+            ))}
         </div>
-      ) : selectedMessage?.bodyData ? (
-        <div dangerouslySetInnerHTML={{ __html: selectedMessage?.bodyData }} />
-      ) : null}
+        <div>{isFetchingNextPage && <RotateCw className="mb-2 animate-spin " />}</div>
+      </section>
+
+      <section className="col-span-3 flex w-full flex-col items-center justify-center overflow-x-hidden bg-white">
+        {selectedMessage?.isBodyWithParts ? (
+          <div
+            className="w-full px-4"
+            key={selectedMessage?.bodyData}
+            style={{ whiteSpace: 'pre-wrap' }}
+          >
+            {selectedMessage?.bodyData}
+          </div>
+        ) : selectedMessage?.bodyData ? (
+          <div dangerouslySetInnerHTML={{ __html: selectedMessage?.bodyData }} />
+        ) : null}
+      </section>
     </div>
   )
 }
