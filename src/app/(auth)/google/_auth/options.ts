@@ -1,11 +1,12 @@
 'use server'
 
 import { cookies } from 'next/headers'
+import { formatDate } from '@/shared/lib/data-format'
 import { google } from 'googleapis'
 import { jwtVerify, SignJWT } from 'jose'
+import juice from 'juice'
 
 import { MainSession } from './types'
-import { formatDate } from '@/shared/lib/data-format'
 
 const secretKey = process.env.NEXT_AUTH_SECRET
 const key = new TextEncoder().encode(secretKey)
@@ -69,26 +70,31 @@ export async function getMessagesAndContent(
   )
 
   const messagesData = messages.map((message: any) => {
+    // console.log(`from ${message.value?.data?.payload?.headers} body:`, message.value?.data?.payload)
     const headers = message.value?.data?.payload?.headers
     const subjectHeader = headers.find((header: any) => header.name === 'Subject')
     const fromHeader = headers.find((header: any) => header.name === 'From')
     const toHeader = headers.find((header: any) => header.name === 'To')
+    const messageId = message.value?.data?.id
     const dateHeader = headers.find((header: any) => header.name === 'Date')
 
     const subject = subjectHeader ? subjectHeader.value : ''
-    const from = fromHeader ? extractName(fromHeader.value) : ''
-
     const to = toHeader ? toHeader.value : ''
-    // const date = dateHeader ? dateHeader.value : ''
-    const date = dateHeader ? formatDate(dateHeader.value) : ''
     const snippet = message.value?.data?.snippet
     const isUnread = message.value?.data?.labelIds.includes('UNREAD')
+
+    const from = fromHeader ? extractName(fromHeader.value) : ''
+    const date = dateHeader ? formatDate(dateHeader.value) : ''
 
     let isBodyWithParts = false
     let body
 
     if (message.value?.data?.payload?.parts) {
-      body = message.value?.data?.payload?.parts[1]?.body?.data
+      if (message.value?.data?.payload?.parts.length > 1) {
+        body = message.value?.data?.payload?.parts[1]?.body?.data
+      } else {
+        body = message.value?.data?.payload?.parts[0]?.body?.data
+      }
     } else {
       isBodyWithParts = true
       body = message.value?.data?.payload?.body?.data
@@ -100,8 +106,32 @@ export async function getMessagesAndContent(
       decodedText = Buffer.from(base64text, 'base64').toString('utf8')
     }
     const bodyData = decodedText
-
-    return { subject, from, to, date, snippet, isUnread, isBodyWithParts, bodyData }
+    return { messageId, subject, from, to, date, snippet, isUnread, isBodyWithParts, bodyData }
   })
   return { messagesData, nextPageToken }
+}
+
+export async function markAsRead(accessToken: string, refreshToken: string, messageId: string) {
+  if (!accessToken || !refreshToken) {
+    throw new Error('Account not found')
+  }
+
+  const oauth2Client = new google.auth.OAuth2(
+    process.env.GOOGLE_CLIENT_ID,
+    process.env.GOOGLE_CLIENT_SECRET,
+  )
+  oauth2Client.setCredentials({
+    access_token: accessToken,
+    refresh_token: refreshToken,
+  })
+
+  const gmail = google.gmail({ version: 'v1', auth: oauth2Client })
+
+  await gmail.users.messages.modify({
+    userId: 'me',
+    id: messageId,
+    requestBody: {
+      removeLabelIds: ['UNREAD'],
+    },
+  })
 }
