@@ -4,7 +4,6 @@ import { cookies } from 'next/headers'
 import { formatDate } from '@/shared/lib/data-format'
 import { google } from 'googleapis'
 import { jwtVerify, SignJWT } from 'jose'
-import juice from 'juice'
 
 import { MainSession } from './types'
 

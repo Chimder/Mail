@@ -7,14 +7,11 @@ export default async function Email({ params }: { params: { email: string } }) {
   const session = await getSession()
   const mail = decodeURIComponent(params?.email)
   const gmailAccount = session?.user.accounts.find(acc => acc.email === mail)
+  console.log('GGMAIl', gmailAccount)
 
   if (!gmailAccount) {
     return <>gmail Not Found</>
   }
 
-  return (
-    <section className="">
-      {gmailAccount && <Gmail accountData={gmailAccount} />}
-    </section>
-  )
+  return <section className="">{gmailAccount && <Gmail accountData={gmailAccount} />}</section>
 }

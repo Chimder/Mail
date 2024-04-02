@@ -3,6 +3,8 @@ import Link from 'next/link'
 
 import { MainSession } from '@/app/(auth)/google/_auth/types'
 
+import { Button } from './ui/button'
+
 type Props = {
   session: MainSession | null
 }
@@ -18,6 +20,9 @@ export const MainLayout = ({ session }: Props) => {
           </Link>
         ))}
         {/* <ThemeToggle /> */}
+        <Link href={`google/login`}>
+          <Button>LOG</Button>
+        </Link>
       </div>
     </nav>
   )

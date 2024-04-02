@@ -1,7 +1,9 @@
 import SignInButton from '@/components/signInButton'
-import { Test } from '@/components/test'
+import { getSession } from './(auth)/google/_auth/options'
 
 export default async function Home() {
+  const sess = await getSession()
+  console.log("SESSSS",sess?.user)
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
@@ -9,8 +11,6 @@ export default async function Home() {
           Get started by editing&nbsp;
         </p>
       </div>
-      {/* <SignInButton></SignInButton>
-      <Test /> */}
     </main>
   )
 }

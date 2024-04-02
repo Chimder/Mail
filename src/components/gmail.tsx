@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import juice from 'juice'
 import { RotateCw, Tally1, Tally2 } from 'lucide-react'
 import { useInView } from 'react-intersection-observer'
 
