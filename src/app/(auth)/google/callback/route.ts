@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
   if (req.method === 'GET') {
     // console.log('REQURL', req.nextUrl.origin)
     const code = req.nextUrl.searchParams.get('code') as string
-    const redirect_uri = 'http://localhost:3000/google/callback'
+    const redirect_uri = `${process.env.URL}/google/callback`
     const response = await axios.post('https://oauth2.googleapis.com/token', {
       code,
       client_id: process.env.GOOGLE_CLIENT_ID,
