@@ -1,12 +1,14 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useInfiniteQuery, useMutation } from '@tanstack/react-query'
 import { RotateCw, Tally1, Tally2 } from 'lucide-react'
 import { useInView } from 'react-intersection-observer'
 
 import { getMessagesAndContent, markAsRead } from '@/app/(auth)/google/_auth/options'
 import { Account } from '@/app/(auth)/google/_auth/types'
+
+import { Button } from './ui/button'
 
 type mailDatas = {
   messageId: any
@@ -26,7 +28,7 @@ type Props = {
 
 export default function Gmail({ accountData }: Props) {
   const [selectedMessage, setSelectedMessage] = useState<any>()
-  const [mailDatas, setMailDatas] = useState<mailDatas[]>([]) // Добавлено
+  const [mailDatas, setMailDatas] = useState<mailDatas[]>([])
 
   const fetchMessPages = async ({ pageParam }: { pageParam?: number }) => {
     const response: any = await getMessagesAndContent(
@@ -41,6 +43,8 @@ export default function Gmail({ accountData }: Props) {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
+    isRefetching,
+    refetch,
   } = useInfiniteQuery({
     queryKey: [`${accountData.email}`],
     queryFn: fetchMessPages,
@@ -69,15 +73,15 @@ export default function Gmail({ accountData }: Props) {
     onSuccess: (data, variables) => {
       // Обновляем данные после успешной мутации
       const updatedMailDatas = mailDatas.map(mess =>
-        mess.messageId === variables.messId ? { ...mess, isUnread: false } : mess
+        mess.messageId === variables.messId ? { ...mess, isUnread: false } : mess,
       )
       setMailDatas(updatedMailDatas)
-    }
+    },
   })
 
   const chooseMessage = (data: Partial<mailDatas>) => {
     mutate({ messId: data.messageId })
-    setSelectedMessage(data)
+    setSelectedMessage(data!)
   }
 
   const { ref, inView } = useInView()
@@ -87,17 +91,19 @@ export default function Gmail({ accountData }: Props) {
     }
   }, [inView])
 
-
   return (
     <div className="grid h-[100vh] grid-cols-5 bg-white pt-[6.8vh]">
       <section className="col-span-2 flex flex-col items-center justify-start pl-[12vw] ">
         <div className="m-0 flex h-[89vh] w-full flex-col items-center justify-start overflow-x-hidden overflow-y-scroll p-0">
+          <Button onClick={() => refetch()}>
+            {isRefetching ? <RotateCw className="mb-2 animate-spin " /> : 'REF'}
+          </Button>
           {mailDatas &&
             mailDatas?.map((mess, i) => (
               <div
                 ref={ref}
                 key={`${mess.snippet} + ${i}`}
-                className="ml-0 flex w-full justify-center !pl-0"
+                className={`ml-0 flex w-full cursor-pointer justify-center !pl-0 hover:bg-black/15 ${selectedMessage?.messageId == mess.messageId ? 'bg-black/20' : ''}`}
                 onClick={() => chooseMessage(mess)}
               >
                 <div className="flex w-full items-center justify-start divide-y divide-dashed divide-blue-200">
