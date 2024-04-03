@@ -1,9 +1,10 @@
-import SignInButton from '@/components/signInButton'
 import { getSession } from './(auth)/google/_auth/options'
+import { getDomains, getTempEmail } from './(auth)/temp/action'
 
 export default async function Home() {
-  const sess = await getSession()
-  console.log("SESSSS",sess?.user)
+  // const sess = await getSession()
+  const temp = await getTempEmail()
+  console.log('TEMP', temp)
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
