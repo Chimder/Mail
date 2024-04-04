@@ -6,7 +6,8 @@ import '../styles/globals.css'
 import { MainLayout } from '@/components/mainLayout'
 import { ClientProvider } from '@/components/providers/tanstack-provider'
 
-import { getSession } from './(auth)/google/_auth/options'
+import { getGmailSession } from './(auth)/google/_auth/options'
+import { getTempSession } from './(auth)/temp/_auth/options'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -20,12 +21,13 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const session = await getSession()
+  const googleSession = await getGmailSession()
+  const tempSession = await getTempSession()
   return (
     <ClientProvider>
       <html lang="en">
         <body className={inter.className}>
-          <MainLayout session={session}></MainLayout>
+          <MainLayout googleSession={googleSession} tempSession={tempSession}></MainLayout>
           {children}
         </body>
       </html>

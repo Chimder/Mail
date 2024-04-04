@@ -17,3 +17,18 @@ export const formatDate = (dateString: string): string => {
     return date.format('MMM YYYY')
   }
 }
+
+export const formatTempDate = (dateString: string): string => {
+  const date = moment(dateString)
+
+  if (moment().isSame(date, 'day')) {
+    // Если письмо пришло сегодня, показывать время
+    return date.format('HH:mm')
+  } else if (moment().isSame(date, 'day')) {
+    // Если письмо было получено вчера, показывать день недели и время
+    return date.format('ddd HH:mm')
+  } else {
+    // В других случаях отобразить полную дату и время
+    return date.format('MMM D, YYYY HH:mm')
+  }
+}

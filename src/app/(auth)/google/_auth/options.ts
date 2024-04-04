@@ -5,7 +5,7 @@ import { formatDate } from '@/shared/lib/data-format'
 import { google } from 'googleapis'
 import { jwtVerify, SignJWT } from 'jose'
 
-import { MainSession } from './types'
+import { GoogleSession } from './types'
 
 const secretKey = process.env.NEXT_AUTH_SECRET
 const key = new TextEncoder().encode(secretKey)
@@ -20,7 +20,7 @@ export async function decrypt(input: string): Promise<any> {
   })
   return payload
 }
-export async function getSession(): Promise<MainSession | null> {
+export async function getGmailSession(): Promise<GoogleSession | null> {
   const session = cookies().get('sessionGoogle')?.value
   if (!session) return null
   return await decrypt(session)

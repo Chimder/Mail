@@ -5,23 +5,13 @@ import { cookies } from 'next/headers'
 import axios from 'axios'
 import { v4 as uuidv4 } from 'uuid'
 
-import { decrypt, encrypt } from '../google/_auth/options'
+import { decrypt, encrypt } from '../../google/_auth/options'
+import { TempAccount, TempMess, TempSession } from './types'
 
-interface Account {
-  email: string
-  provider: string
-  accessToken: string
-  expires: number
-}
-
-interface Session {
-  accounts: Account[]
-  expires: number
-}
-
-export async function test() {
-  console.log('COOOOCKOKIIEIEI')
-  cookies().set('testtt', 'testtt')
+export async function getTempSession(): Promise<TempSession | null> {
+  const session = cookies().get('sessionTempTm')?.value
+  if (!session) return null
+  return await decrypt(session)
 }
 
 export async function regTempEmailAccount() {
@@ -40,11 +30,11 @@ export async function regTempEmailAccount() {
       address: address,
       password: password,
     })
-    console.log('LOGINRES', loginResponse.data)
+    // console.log('LOGINRES', loginResponse.data)
 
     const token = loginResponse.data.token
 
-    const newAccount: Account = {
+    const newAccount: TempAccount = {
       email: address,
       provider: 'mail.tm',
       accessToken: loginResponse.data.token,
@@ -52,15 +42,15 @@ export async function regTempEmailAccount() {
     }
 
     let session = cookies().get('sessionTempTm')?.value
-    console.log('SESSSION', session)
-    let parsed: Session | null = null
+    // console.log('SESSSION', session)
+    let parsed: TempSession | null = null
     if (session) {
-      parsed = (await decrypt(session)) as Session
+      parsed = (await decrypt(session)) as TempSession
     } else {
       parsed = { accounts: [], expires: new Date().setDate(new Date().getDate() + 1) }
     }
     parsed.accounts.push(newAccount)
-    console.log('PARSED', parsed)
+    // console.log('PARSED', parsed)
 
     cookies().set('sessionTempTm', await encrypt(parsed), {
       expires: parsed.expires,
@@ -71,7 +61,7 @@ export async function regTempEmailAccount() {
   }
 }
 
-export async function getMessages(token: string, page: string) {
+export async function getTempMessages(token: string, page: string): Promise<TempMess | undefined> {
   try {
     if (!page) {
       page = '1'
@@ -80,6 +70,20 @@ export async function getMessages(token: string, page: string) {
       headers: { Authorization: `Bearer ${token}` },
     })
     return messages.data
+  } catch (error) {
+    console.log(error)
+  }
+}
+export async function getMessageBody(token?: string, messageId?: string) {
+  if (!token || !messageId) {
+    return undefined
+  }
+
+  try {
+    const message = await axios.get(`https://api.mail.tm/messages/${messageId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    return message.data
   } catch (error) {
     console.log(error)
   }

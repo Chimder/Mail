@@ -4,7 +4,7 @@ import axios from 'axios'
 import { v4 as uuidv4 } from 'uuid'
 
 import { decrypt, encrypt } from '../_auth/options'
-import { Account, MainSession, User } from '../_auth/types'
+import { GoogleAccount, GoogleSession, GoogleUser } from '../_auth/types'
 
 export async function GET(req: NextRequest) {
   if (req.method === 'GET') {
@@ -28,12 +28,12 @@ export async function GET(req: NextRequest) {
 
     const session = cookies().get('sessionGoogle')?.value
     if (session) {
-      const parsed: MainSession = await decrypt(session)
+      const parsed: GoogleSession = await decrypt(session)
       // console.log('parsedDATA', parsed)
 
       //filter acount
       const accountIndex = parsed.user.accounts.find(
-        (acc: Account) => acc.providerId === 'google' && acc.providerAccountId === googleId,
+        (acc: GoogleAccount) => acc.providerId === 'google' && acc.providerAccountId === googleId,
       )
       // console.log('ACCINDEX', accountIndex)
 
@@ -49,7 +49,7 @@ export async function GET(req: NextRequest) {
         return NextResponse.redirect(req.nextUrl.origin)
       } else {
         //create account
-        const newAccount: Account = {
+        const newAccount: GoogleAccount = {
           name,
           providerId: 'google',
           providerAccountId: googleId,
@@ -71,11 +71,11 @@ export async function GET(req: NextRequest) {
       //create new user and account//
       //gen id random
       const newUserId = uuidv4()
-      const user: User = {
+      const user: GoogleUser = {
         id: newUserId,
         accounts: [],
       }
-      const account: Account = {
+      const account: GoogleAccount = {
         name,
         providerId: 'google',
         providerAccountId: googleId,

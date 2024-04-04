@@ -1,14 +1,14 @@
-export interface MainSession {
-  user: User
+export interface GoogleSession {
+  user: GoogleUser
   expires: number
   iat: number
 }
-export type User = {
+export type GoogleUser = {
   id: string
-  accounts: Account[]
+  accounts: GoogleAccount[]
 }
 
-export type Account = {
+export type GoogleAccount = {
   name: string
   picture: string
   providerId: string

@@ -6,8 +6,9 @@ import { RotateCw, Tally1, Tally2 } from 'lucide-react'
 import { useInView } from 'react-intersection-observer'
 
 import { getMessagesAndContent, markAsRead } from '@/app/(auth)/google/_auth/options'
-import { Account } from '@/app/(auth)/google/_auth/types'
+import { GoogleAccount } from '@/app/(auth)/google/_auth/types'
 
+import Spinner from './spiner'
 import { Button } from './ui/button'
 
 type mailDatas = {
@@ -23,7 +24,7 @@ type mailDatas = {
 }
 
 type Props = {
-  accountData: Account
+  accountData: GoogleAccount
 }
 
 export default function Gmail({ accountData }: Props) {
@@ -42,6 +43,8 @@ export default function Gmail({ accountData }: Props) {
     data: mailData,
     fetchNextPage,
     hasNextPage,
+    isFetching,
+    isPending,
     isFetchingNextPage,
     isRefetching,
     refetch,
@@ -90,6 +93,10 @@ export default function Gmail({ accountData }: Props) {
       fetchNextPage()
     }
   }, [inView])
+
+  if (isPending) {
+    return <Spinner />
+  }
 
   return (
     <div className="grid h-[100vh] grid-cols-5 bg-white pt-[6.8vh]">

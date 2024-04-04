@@ -1,26 +1,42 @@
-'use server'
+'use client'
 
 import React from 'react'
 import Link from 'next/link'
+import { useParams, usePathname } from 'next/navigation'
 
-import { MainSession } from '@/app/(auth)/google/_auth/types'
-import { regTempEmailAccount } from '@/app/(auth)/temp/action'
+import { GoogleSession } from '@/app/(auth)/google/_auth/types'
+import { regTempEmailAccount } from '@/app/(auth)/temp/_auth/options'
+import { TempSession } from '@/app/(auth)/temp/_auth/types'
 
 import { Button } from './ui/button'
 
 type Props = {
-  session: MainSession | null
+  googleSession: GoogleSession | null
+  tempSession: TempSession | null
 }
-export const MainLayout = ({ session }: Props) => {
-  // console.log('SESSS', session?.user?.accounts)
+export const MainLayout = ({ googleSession, tempSession }: Props) => {
+  const path = useParams()
+  const mail = decodeURIComponent(path?.email as string)
 
   return (
     <nav className="nav_bar_container">
       <div className="z-100 flex w-full justify-evenly">
-        {session?.user?.accounts.map((email, i) => (
-          <Link href={`/${email.email}`} key={email.providerAccountId}>
-            <img className="h-10 w-10" src={email.picture} alt="" />
-            {/* <div>{email.email}</div> */}
+        {googleSession?.user?.accounts.map((email, i) => (
+          <Link
+            className={`${mail == email.email ? 'bg-black/30' : ''}`}
+            href={`/google/${email.email}`}
+            key={email.providerAccountId}
+          >
+            <img className="h-10 w-10 rounded-full" src={email.picture} alt="" />
+          </Link>
+        ))}
+        {tempSession?.accounts.map((email, i) => (
+          <Link
+            className={`${mail == email.email ? 'bg-green-500' : ''}`}
+            href={`/temp/${email.email}`}
+            key={email.email}
+          >
+            <img className="h-10 w-10 rounded-full" src="/Logo/MailTm_Logo.webp" alt="" />
           </Link>
         ))}
         {/* <ThemeToggle /> */}
