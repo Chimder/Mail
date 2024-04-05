@@ -2,26 +2,15 @@
 
 import { useEffect, useState } from 'react'
 import { useInfiniteQuery, useMutation } from '@tanstack/react-query'
-import { RotateCw, Tally1, Tally2 } from 'lucide-react'
+import { LogOut, RotateCw, Tally1, Tally2 } from 'lucide-react'
 import { useInView } from 'react-intersection-observer'
 
 import { getMessagesAndContent, markAsRead } from '@/app/(auth)/google/_auth/options'
-import { GoogleAccount } from '@/app/(auth)/google/_auth/types'
+import { GoogleAccount, mailDatas } from '@/app/(auth)/google/_auth/types'
 
+import CopyMail from './copy'
 import Spinner from './spiner'
-import { Button } from './ui/button'
-
-type mailDatas = {
-  messageId: any
-  subject: any
-  from: string
-  to: any
-  date: string
-  snippet: any
-  isUnread: any
-  isBodyWithParts: boolean
-  bodyData: string
-}
+import { Badge } from './ui/badge'
 
 type Props = {
   accountData: GoogleAccount
@@ -46,7 +35,6 @@ export default function Gmail({ accountData }: Props) {
     isFetching,
     isPending,
     isFetchingNextPage,
-    isRefetching,
     refetch,
   } = useInfiniteQuery({
     queryKey: [`${accountData.email}`],
@@ -74,7 +62,6 @@ export default function Gmail({ accountData }: Props) {
     mutationFn: ({ messId }: { messId: string }) =>
       markAsRead(accountData?.accessToken, accountData?.refreshToken, messId),
     onSuccess: (data, variables) => {
-      // Обновляем данные после успешной мутации
       const updatedMailDatas = mailDatas.map(mess =>
         mess.messageId === variables.messId ? { ...mess, isUnread: false } : mess,
       )
@@ -97,14 +84,21 @@ export default function Gmail({ accountData }: Props) {
   if (isPending) {
     return <Spinner />
   }
+  console.log('MEILDATA', mailData)
 
   return (
     <div className="grid h-[100vh] grid-cols-5 bg-white pt-[6.8vh]">
       <section className="col-span-2 flex flex-col items-center justify-start pl-[12vw] ">
         <div className="m-0 flex h-[89vh] w-full flex-col items-center justify-start overflow-x-hidden overflow-y-scroll p-0">
-          <Button onClick={() => refetch()}>
-            {isRefetching ? <RotateCw className="mb-2 animate-spin " /> : 'REF'}
-          </Button>
+          <div className="flex my-1 w-full h-full items-center justify-evenly">
+            <Badge>{accountData.email}</Badge>
+            <CopyMail mail={accountData.email} />
+            <RotateCw
+              onClick={() => refetch()}
+              className={`${isFetching ? 'animate-spin' : ''}`}
+            />
+            <LogOut />
+          </div>
           {mailDatas &&
             mailDatas?.map((mess, i) => (
               <div

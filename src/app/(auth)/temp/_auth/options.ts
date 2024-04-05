@@ -1,17 +1,18 @@
 'use server'
 
-import { pages } from 'next/dist/build/templates/app-page'
 import { cookies } from 'next/headers'
 import axios from 'axios'
 import { v4 as uuidv4 } from 'uuid'
 
 import { decrypt, encrypt } from '../../google/_auth/options'
-import { TempAccount, TempMess, TempSession } from './types'
+import { TempAccount, TempMess } from './types'
 
-export async function getTempSession(): Promise<TempSession | null> {
-  const session = cookies().get('sessionTempTm')?.value
-  if (!session) return null
-  return await decrypt(session)
+export async function getTempSession(): Promise<TempAccount[] | null> {
+  const cookiesAll = cookies()
+  const tempAccounts = cookiesAll.getAll().filter(cookie => cookie.name.startsWith('tempmail_'))
+  const accounts = await Promise.all(tempAccounts.map(cookie => decrypt(cookie.value)))
+
+  return accounts
 }
 
 export async function regTempEmailAccount() {
@@ -30,9 +31,6 @@ export async function regTempEmailAccount() {
       address: address,
       password: password,
     })
-    // console.log('LOGINRES', loginResponse.data)
-
-    const token = loginResponse.data.token
 
     const newAccount: TempAccount = {
       email: address,
@@ -41,24 +39,17 @@ export async function regTempEmailAccount() {
       expires: new Date().setDate(new Date().getDate() + 1),
     }
 
-    let session = cookies().get('sessionTempTm')?.value
-    // console.log('SESSSION', session)
-    let parsed: TempSession | null = null
-    if (session) {
-      parsed = (await decrypt(session)) as TempSession
-    } else {
-      parsed = { accounts: [], expires: new Date().setDate(new Date().getDate() + 1) }
-    }
-    parsed.accounts.push(newAccount)
-    // console.log('PARSED', parsed)
-
-    cookies().set('sessionTempTm', await encrypt(parsed), {
-      expires: parsed.expires,
+    cookies().set(`tempmail_${address}`, await encrypt(newAccount), {
+      expires: newAccount.expires,
       httpOnly: true,
     })
   } catch (error) {
     console.error(error)
   }
+}
+
+export async function deleteTempMail(email: string) {
+  cookies().delete(`tempmail_${email}`)
 }
 
 export async function getTempMessages(token: string, page: string): Promise<TempMess | undefined> {

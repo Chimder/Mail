@@ -3,20 +3,22 @@
 import React from 'react'
 import Link from 'next/link'
 import { useParams, usePathname } from 'next/navigation'
+import { CirclePlus } from 'lucide-react'
 
 import { GoogleSession } from '@/app/(auth)/google/_auth/types'
 import { regTempEmailAccount } from '@/app/(auth)/temp/_auth/options'
-import { TempSession } from '@/app/(auth)/temp/_auth/types'
+import { TempAccount } from '@/app/(auth)/temp/_auth/types'
 
 import { Button } from './ui/button'
 
 type Props = {
   googleSession: GoogleSession | null
-  tempSession: TempSession | null
+  tempSession: TempAccount[] | null
 }
 export const MainLayout = ({ googleSession, tempSession }: Props) => {
   const path = useParams()
   const mail = decodeURIComponent(path?.email as string)
+  console.log(',,,,,', tempSession)
 
   return (
     <nav className="nav_bar_container">
@@ -30,7 +32,7 @@ export const MainLayout = ({ googleSession, tempSession }: Props) => {
             <img className="h-10 w-10 rounded-full" src={email.picture} alt="" />
           </Link>
         ))}
-        {tempSession?.accounts.map((email, i) => (
+        {tempSession?.map((email, i) => (
           <Link
             className={`${mail == email.email ? 'bg-green-500' : ''}`}
             href={`/temp/${email.email}`}
@@ -39,6 +41,7 @@ export const MainLayout = ({ googleSession, tempSession }: Props) => {
             <img className="h-10 w-10 rounded-full" src="/Logo/MailTm_Logo.webp" alt="" />
           </Link>
         ))}
+        <CirclePlus className="h-10 w-10"></CirclePlus>
         {/* <ThemeToggle /> */}
         <Link href={`google/login`}>
           <Button>LOG</Button>

@@ -18,3 +18,16 @@ export type GoogleAccount = {
   refreshToken: string
   userId: string
 }
+
+
+export type mailDatas = {
+  messageId: any
+  subject: any
+  from: string
+  to: any
+  date: string
+  snippet: any
+  isUnread: any
+  isBodyWithParts: boolean
+  bodyData: string
+}

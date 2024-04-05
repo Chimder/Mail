@@ -1,16 +1,16 @@
 'use client'
 
 import React, { useState } from 'react'
-import { formatDate, formatTempDate } from '@/shared/lib/data-format'
+import { formatTempDate } from '@/shared/lib/data-format'
 import { useQuery } from '@tanstack/react-query'
-import { RotateCw, Tally1, Tally2 } from 'lucide-react'
-import { useFormState } from 'react-dom'
+import { LogOut, RotateCw, Tally1, Tally2 } from 'lucide-react'
 
 import { getMessageBody, getTempMessages } from '@/app/(auth)/temp/_auth/options'
 import { HydraMember, TempAccount } from '@/app/(auth)/temp/_auth/types'
 
-import { Button } from './ui/button'
+import CopyMail from './copy'
 import Spinner from './spiner'
+import { Badge } from './ui/badge'
 
 type Props = {
   accountData: TempAccount
@@ -26,12 +26,10 @@ export default function TempMail({ accountData }: Props) {
     retry: 0,
   })
 
-  // console.log('MESSBODY', messBody)
-
   const {
     data: mess,
     isPending,
-    isRefetching,
+    isFetching,
     refetch,
   } = useQuery({
     queryKey: ['temp', accountData.email],
@@ -40,26 +38,28 @@ export default function TempMail({ accountData }: Props) {
     retry: 0,
   })
 
-  // console.log('allMEss', mess)
 
   if (isPending) {
     return <Spinner />
   }
   return (
     <div className="grid h-[100vh] grid-cols-5 bg-white pt-[6.8vh]">
-      <section className="col-span-2 flex flex-col items-center justify-start pl-[12vw] ">
+      <section className="col-span-2 flex flex-col  pl-[12vw] ">
         <div className="m-0 flex h-[89vh] w-full flex-col items-center justify-start overflow-x-hidden overflow-y-scroll p-0">
-          <Button onClick={() => refetch()}>
-            {isRefetching ? <RotateCw className="mb-2 animate-spin " /> : 'REF'}
-          </Button>
+          <div className="my-1 flex w-full items-center justify-evenly">
+            <Badge>{accountData.email}</Badge>
+            <CopyMail mail={accountData.email} />
+            <RotateCw onClick={() => refetch()} className={`${isFetching ? 'animate-spin' : ''}`} />
+            <LogOut />
+          </div>
           {mess?.['hydra:member'].map((mess: HydraMember) => (
             <div
-              key={`${mess['@id']}`}
+              key={mess.id}
               className={`ml-0 flex w-full cursor-pointer justify-center !pl-0 hover:bg-black/15 `}
               onClick={() => setMessBody(mess.id)}
             >
               <div className="flex w-full items-center justify-start divide-y divide-dashed divide-blue-200">
-                <Tally2 className="h-6 w-6 pr-1 text-sky-600" />
+                <Tally1 className="h-6 w-6 pr-1 text-orange-500" />
                 <div className="w-full">
                   <div className="flex justify-between">
                     <div className="flex text-base">{mess?.from.name}</div>
@@ -77,10 +77,13 @@ export default function TempMail({ accountData }: Props) {
       </section>
 
       <section className="col-span-3 flex w-full flex-col items-center justify-center  overflow-x-hidden ">
-        <iframe
-          className="flex h-full w-full flex-col items-center justify-center overflow-x-hidden font-sans"
-          srcDoc={messBody?.html[0]}
-        />
+        {messBody && (
+          <iframe
+            key={messBody.id}
+            className="flex h-full w-full flex-col items-center justify-center overflow-x-hidden font-sans"
+            srcDoc={messBody.html[0]}
+          />
+        )}
       </section>
     </div>
   )

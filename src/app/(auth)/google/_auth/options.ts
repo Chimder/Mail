@@ -3,7 +3,8 @@
 import { cookies } from 'next/headers'
 import { formatDate } from '@/shared/lib/data-format'
 import { google } from 'googleapis'
-import { jwtVerify, SignJWT } from 'jose'
+// import { jwtVerify, SignJWT } from 'jose'
+import * as jose from 'jose'
 
 import { GoogleSession } from './types'
 
@@ -11,11 +12,14 @@ const secretKey = process.env.NEXT_AUTH_SECRET
 const key = new TextEncoder().encode(secretKey)
 
 export async function encrypt(payload: any) {
-  return await new SignJWT(payload).setProtectedHeader({ alg: 'HS256' }).setIssuedAt().sign(key)
+  return await new jose.SignJWT(payload)
+    .setProtectedHeader({ alg: 'HS256' })
+    .setIssuedAt()
+    .sign(key)
 }
 
 export async function decrypt(input: string): Promise<any> {
-  const { payload } = await jwtVerify(input, key, {
+  const { payload } = await jose.jwtVerify(input, key, {
     algorithms: ['HS256'],
   })
   return payload
