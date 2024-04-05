@@ -7,7 +7,7 @@ import { MainLayout } from '@/components/mainLayout'
 import { ClientProvider } from '@/components/providers/tanstack-provider'
 
 import { getGmailSession } from './(auth)/google/_auth/options'
-import { checkAndCleanExpiredAccounts, getTempSession } from './(auth)/temp/_auth/options'
+import {  getTempSession } from './(auth)/temp/_auth/options'
 
 const inter = Inter({ subsets: ['latin'] })
 
