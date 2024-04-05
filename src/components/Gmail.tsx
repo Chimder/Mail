@@ -5,12 +5,17 @@ import { useInfiniteQuery, useMutation } from '@tanstack/react-query'
 import { LogOut, RotateCw, Tally1, Tally2 } from 'lucide-react'
 import { useInView } from 'react-intersection-observer'
 
-import { getMessagesAndContent, markAsRead } from '@/app/(auth)/google/_auth/options'
+import {
+  deleteGoogleMail,
+  getMessagesAndContent,
+  markAsRead,
+} from '@/app/(auth)/google/_auth/options'
 import { GoogleAccount, mailDatas } from '@/app/(auth)/google/_auth/types'
 
 import CopyMail from './copy'
 import Spinner from './spiner'
 import { Badge } from './ui/badge'
+import { Button } from './ui/button'
 
 type Props = {
   accountData: GoogleAccount
@@ -84,21 +89,17 @@ export default function Gmail({ accountData }: Props) {
   if (isPending) {
     return <Spinner />
   }
-  console.log('MEILDATA', mailData)
 
   return (
     <div className="grid h-[100vh] grid-cols-5 bg-white pt-[6.8vh]">
       <section className="col-span-2 flex flex-col items-center justify-start pl-[12vw] ">
-        <div className="m-0 flex h-[89vh] w-full flex-col items-center justify-start overflow-x-hidden overflow-y-scroll p-0">
-          <div className="flex my-1 w-full h-full items-center justify-evenly">
-            <Badge>{accountData.email}</Badge>
-            <CopyMail mail={accountData.email} />
-            <RotateCw
-              onClick={() => refetch()}
-              className={`${isFetching ? 'animate-spin' : ''}`}
-            />
-            <LogOut />
-          </div>
+        <div className="my-2 flex w-full items-center justify-evenly">
+          <Button>{accountData.email}</Button>
+          <CopyMail mail={accountData.email} />
+          <RotateCw onClick={() => refetch()} className={`${isFetching ? 'animate-spin' : ''}`} />
+          <LogOut className="cursor-pointer" onClick={() => deleteGoogleMail(accountData?.email)} />
+        </div>
+        <div className="m-0 flex h-[87vh] w-full  flex-col items-center justify-start overflow-x-hidden overflow-y-scroll p-0">
           {mailDatas &&
             mailDatas?.map((mess, i) => (
               <div
@@ -128,8 +129,8 @@ export default function Gmail({ accountData }: Props) {
                 </div>
               </div>
             ))}
+          <div>{isFetchingNextPage && <RotateCw className="my-1  animate-spin " />}</div>
         </div>
-        <div>{isFetchingNextPage && <RotateCw className="mb-2 animate-spin " />}</div>
       </section>
 
       <section className="col-span-3 flex w-full flex-col items-center justify-center  overflow-x-hidden ">

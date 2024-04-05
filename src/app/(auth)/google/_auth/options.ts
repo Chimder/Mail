@@ -3,35 +3,34 @@
 import { cookies } from 'next/headers'
 import { formatDate } from '@/shared/lib/data-format'
 import { google } from 'googleapis'
-// import { jwtVerify, SignJWT } from 'jose'
-import * as jose from 'jose'
+import { jwtVerify, SignJWT } from 'jose'
 
-import { GoogleSession } from './types'
+import { GoogleAccount } from './types'
+import { redirect } from 'next/navigation'
 
 const secretKey = process.env.NEXT_AUTH_SECRET
 const key = new TextEncoder().encode(secretKey)
 
 export async function encrypt(payload: any) {
-  return await new jose.SignJWT(payload)
-    .setProtectedHeader({ alg: 'HS256' })
-    .setIssuedAt()
-    .sign(key)
+  return await new SignJWT(payload).setProtectedHeader({ alg: 'HS256' }).setIssuedAt().sign(key)
 }
 
 export async function decrypt(input: string): Promise<any> {
-  const { payload } = await jose.jwtVerify(input, key, {
+  if (!input) {
+    console.log('ERRR 18')
+    return undefined
+  }
+  const { payload } = await jwtVerify(input, key, {
     algorithms: ['HS256'],
   })
   return payload
 }
-export async function getGmailSession(): Promise<GoogleSession | null> {
-  const session = cookies().get('sessionGoogle')?.value
-  if (!session) return null
-  return await decrypt(session)
-}
-function extractName(from: string) {
-  const match = from.match(/(.*)<.*>/)
-  return match ? match[1].trim() : from
+
+export async function deleteGoogleMail(email: string) {
+  cookies().delete(`googleMailer_${email}`)
+  const activeAccount = await getGmailSession()
+  if (!activeAccount) redirect('/')
+  redirect(`/google/${activeAccount[0].email}`)
 }
 
 export async function getMessagesAndContent(
@@ -73,7 +72,6 @@ export async function getMessagesAndContent(
   )
 
   const messagesData = messages.map((message: any) => {
-    // console.log(`from ${message.value?.data?.payload?.headers} body:`, message.value?.data?.payload)
     const headers = message.value?.data?.payload?.headers
     const subjectHeader = headers.find((header: any) => header.name === 'Subject')
     const fromHeader = headers.find((header: any) => header.name === 'From')
@@ -114,6 +112,17 @@ export async function getMessagesAndContent(
   return { messagesData, nextPageToken }
 }
 
+export async function getGmailSession(): Promise<GoogleAccount[] | null> {
+  const cookiesAll = cookies()
+  const tempAccounts = cookiesAll.getAll().filter(cookie => cookie.name.startsWith('googleMailer_'))
+  const accounts = await Promise.all(tempAccounts.map(cookie => decrypt(cookie.value)))
+  return accounts
+}
+
+function extractName(from: string) {
+  const match = from.match(/(.*)<.*>/)
+  return match ? match[1].trim() : from
+}
 export async function markAsRead(accessToken: string, refreshToken: string, messageId: string) {
   if (!accessToken || !refreshToken) {
     throw new Error('Account not found')

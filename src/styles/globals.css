@@ -103,6 +103,12 @@
   .nav_bar_container {
     @apply fixed left-1/2 top-8 z-999 flex h-full max-h-[54px] w-full max-w-[920px] -translate-x-1/2 -translate-y-1/2 transform items-center rounded-full bg-[rgba(0,0,0,0.2)] p-2 text-lg backdrop-blur-md;
   }
+  .nav_icon {
+    @apply flex cursor-pointer items-center justify-center rounded-lg px-2.5 py-[1px]  transition-colors  hover:bg-background/30;
+  }
+  .nav_icon_active {
+    @apply relative z-100  flex items-center rounded-lg bg-background/25  px-2.5 py-[1px] font-semibold text-white opacity-90  transition-colors;
+  }
   .spin {
     @apply fixed left-1/2 top-1/2 z-999 flex h-full max-h-[154px] w-full max-w-[200px] -translate-x-1/2 -translate-y-1/2 transform items-center rounded-full p-2 text-lg backdrop-blur-md;
   }

@@ -4,11 +4,10 @@ import axios from 'axios'
 import { v4 as uuidv4 } from 'uuid'
 
 import { decrypt, encrypt } from '../_auth/options'
-import { GoogleAccount, GoogleSession, GoogleUser } from '../_auth/types'
+import { GoogleAccount } from '../_auth/types'
 
 export async function GET(req: NextRequest) {
   if (req.method === 'GET') {
-    // console.log('REQURL', req.nextUrl.origin)
     const code = req.nextUrl.searchParams.get('code') as string
     const redirect_uri = `${process.env.URL}/google/callback`
     const response = await axios.post('https://oauth2.googleapis.com/token', {
@@ -24,57 +23,19 @@ export async function GET(req: NextRequest) {
     })
 
     const { email, id: googleId, picture, name } = profileResponse.data
-    //////////////////////////////////////////////////////////////////////////////////////////////
 
-    const session = cookies().get('sessionGoogle')?.value
-    if (session) {
-      const parsed: GoogleSession = await decrypt(session)
-      // console.log('parsedDATA', parsed)
-
-      //filter acount
-      const accountIndex = parsed.user.accounts.find(
-        (acc: GoogleAccount) => acc.providerId === 'google' && acc.providerAccountId === googleId,
-      )
-      // console.log('ACCINDEX', accountIndex)
-
-      if (accountIndex) {
-        //update account
-        accountIndex.accessToken = access_token
-        accountIndex.refreshToken = refresh_token
-
-        cookies().set('sessionGoogle', await encrypt(parsed), {
-          expires: new Date().setFullYear(new Date().getFullYear() + 1),
-          httpOnly: true,
-        })
-        return NextResponse.redirect(req.nextUrl.origin)
-      } else {
-        //create account
-        const newAccount: GoogleAccount = {
-          name,
-          providerId: 'google',
-          providerAccountId: googleId,
-          email,
-          picture,
-          accessToken: access_token,
-          refreshToken: refresh_token,
-          userId: parsed.user.id,
-        }
-        parsed.user.accounts.push(newAccount)
-
-        cookies().set('sessionGoogle', await encrypt(parsed), {
-          expires: parsed.expires,
-          httpOnly: true,
-        })
-        return NextResponse.redirect(req.nextUrl.origin)
-      }
+    const existingAccount = cookies().get(`googleMailer_${email}`)?.value
+    if (existingAccount) {
+      // Update existing account
+      const account: GoogleAccount = await decrypt(existingAccount)
+      account.accessToken = access_token
+      account.refreshToken = refresh_token
+      cookies().set(`googleMailer_${account.email}`, await encrypt(account), {
+        expires: new Date().setFullYear(new Date().getFullYear() + 1),
+        httpOnly: true,
+      })
     } else {
-      //create new user and account//
-      //gen id random
-      const newUserId = uuidv4()
-      const user: GoogleUser = {
-        id: newUserId,
-        accounts: [],
-      }
+      // Create new account
       const account: GoogleAccount = {
         name,
         providerId: 'google',
@@ -83,19 +44,15 @@ export async function GET(req: NextRequest) {
         picture,
         accessToken: access_token,
         refreshToken: refresh_token,
-        userId: newUserId,
+        userId: uuidv4(),
       }
-      user.accounts.push(account)
-
-      const session = { user, expires: new Date().setFullYear(new Date().getFullYear() + 1) }
-      cookies().set('sessionGoogle', await encrypt(session), {
-        expires: session.expires,
+      cookies().set(`googleMailer_${account.email}`, await encrypt(account), {
+        expires: new Date().setFullYear(new Date().getFullYear() + 1),
         httpOnly: true,
       })
-      return NextResponse.redirect(req.nextUrl.origin)
     }
+    return NextResponse.redirect(req.nextUrl.origin)
   } else {
-    // res.status(405).end() // Method Not Allowed
     return NextResponse.redirect(req.nextUrl.origin)
   }
 }

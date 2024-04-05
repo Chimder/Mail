@@ -1,16 +1,16 @@
 import React from 'react'
 
-import { getGmailSession } from '@/app/(auth)/google/_auth/options'
 import Gmail from '@/components/Gmail'
+import { getGmailSession } from '@/app/(auth)/google/_auth/options'
 
 export default async function Email({ params }: { params: { email: string } }) {
-  const session = await getGmailSession()
   const mail = decodeURIComponent(params?.email)
-  const gmailAccount = session?.user.accounts.find(acc => acc.email === mail)
+  const session = await getGmailSession()
+  const gmailAccount = session?.find(acc => acc?.email === mail)
 
   if (!gmailAccount) {
     return <>gmail Not Found</>
   }
 
-  return <section className="">{gmailAccount && <Gmail accountData={gmailAccount} />}</section>
+  return <section className="overflow-y-hidden">{gmailAccount && <Gmail accountData={gmailAccount} />}</section>
 }

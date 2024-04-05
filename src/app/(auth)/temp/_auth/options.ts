@@ -1,6 +1,7 @@
 'use server'
 
 import { cookies } from 'next/headers'
+import { redirect } from 'next/navigation'
 import axios from 'axios'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -11,7 +12,6 @@ export async function getTempSession(): Promise<TempAccount[] | null> {
   const cookiesAll = cookies()
   const tempAccounts = cookiesAll.getAll().filter(cookie => cookie.name.startsWith('tempmail_'))
   const accounts = await Promise.all(tempAccounts.map(cookie => decrypt(cookie.value)))
-
   return accounts
 }
 
@@ -50,6 +50,9 @@ export async function regTempEmailAccount() {
 
 export async function deleteTempMail(email: string) {
   cookies().delete(`tempmail_${email}`)
+  const activeAccount = await getTempSession()
+  if (!activeAccount) redirect('/')
+  redirect(`/temp/${activeAccount[0].email}`)
 }
 
 export async function getTempMessages(token: string, page: string): Promise<TempMess | undefined> {

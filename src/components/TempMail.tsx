@@ -3,14 +3,15 @@
 import React, { useState } from 'react'
 import { formatTempDate } from '@/shared/lib/data-format'
 import { useQuery } from '@tanstack/react-query'
-import { LogOut, RotateCw, Tally1, Tally2 } from 'lucide-react'
+import { LogOut, RotateCw, Tally1 } from 'lucide-react'
 
-import { getMessageBody, getTempMessages } from '@/app/(auth)/temp/_auth/options'
+import { deleteTempMail, getMessageBody, getTempMessages } from '@/app/(auth)/temp/_auth/options'
 import { HydraMember, TempAccount } from '@/app/(auth)/temp/_auth/types'
 
 import CopyMail from './copy'
 import Spinner from './spiner'
 import { Badge } from './ui/badge'
+import { Button } from './ui/button'
 
 type Props = {
   accountData: TempAccount
@@ -38,24 +39,24 @@ export default function TempMail({ accountData }: Props) {
     retry: 0,
   })
 
-
   if (isPending) {
     return <Spinner />
   }
+
   return (
     <div className="grid h-[100vh] grid-cols-5 bg-white pt-[6.8vh]">
-      <section className="col-span-2 flex flex-col  pl-[12vw] ">
-        <div className="m-0 flex h-[89vh] w-full flex-col items-center justify-start overflow-x-hidden overflow-y-scroll p-0">
-          <div className="my-1 flex w-full items-center justify-evenly">
-            <Badge>{accountData.email}</Badge>
-            <CopyMail mail={accountData.email} />
-            <RotateCw onClick={() => refetch()} className={`${isFetching ? 'animate-spin' : ''}`} />
-            <LogOut />
-          </div>
+      <section className="col-span-2 flex flex-col items-center justify-start pl-[12vw] ">
+        <div className="my-2 flex w-full items-center justify-evenly">
+          <Button>{accountData.email}</Button>
+          <CopyMail mail={accountData.email} />
+          <RotateCw onClick={() => refetch()} className={`${isFetching ? 'animate-spin' : ''}`} />
+          <LogOut className="cursor-pointer" onClick={() => deleteTempMail(accountData.email)} />
+        </div>
+        <div className="m-0 flex h-[87vh] w-full flex-col items-center justify-start overflow-x-hidden overflow-y-scroll p-0">
           {mess?.['hydra:member'].map((mess: HydraMember) => (
             <div
               key={mess.id}
-              className={`ml-0 flex w-full cursor-pointer justify-center !pl-0 hover:bg-black/15 `}
+              className={`ml-0 flex w-full cursor-pointer justify-center !pl-0 hover:bg-black/15 ${messageId == mess.id ? 'bg-black/20' : ''}`}
               onClick={() => setMessBody(mess.id)}
             >
               <div className="flex w-full items-center justify-start divide-y divide-dashed divide-blue-200">
