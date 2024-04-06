@@ -51,7 +51,7 @@ export async function GET(req: NextRequest) {
         httpOnly: true,
       })
     }
-    return NextResponse.redirect(req.nextUrl.origin)
+    return NextResponse.redirect(`${process.env.URL}/google/${email}`)
   } else {
     return NextResponse.redirect(req.nextUrl.origin)
   }

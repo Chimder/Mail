@@ -45,7 +45,9 @@ export async function regTempEmailAccount() {
     })
   } catch (error) {
     console.error(error)
+    redirect('/')
   }
+  redirect(`temp/${address}`)
 }
 
 export async function deleteTempMail(email: string) {

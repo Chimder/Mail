@@ -5,9 +5,10 @@ import '../styles/globals.css'
 
 import { MainLayout } from '@/components/mainLayout'
 import { ClientProvider } from '@/components/providers/tanstack-provider'
+import { ThemeProvider } from '@/components/providers/theme-provider'
 
 import { getGmailSession } from './(auth)/google/_auth/options'
-import {  getTempSession } from './(auth)/temp/_auth/options'
+import { getTempSession } from './(auth)/temp/_auth/options'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -27,8 +28,15 @@ export default async function RootLayout({
     <ClientProvider>
       <html lang="en">
         <body className={inter.className}>
-          <MainLayout googleSession={googleSession} tempSession={tempSession}></MainLayout>
-          {children}
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <MainLayout googleSession={googleSession} tempSession={tempSession}></MainLayout>
+            {children}
+          </ThemeProvider>
         </body>
       </html>
     </ClientProvider>

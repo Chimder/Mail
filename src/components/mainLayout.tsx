@@ -2,14 +2,13 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { useParams, usePathname } from 'next/navigation'
+import { useParams } from 'next/navigation'
 import { CirclePlus } from 'lucide-react'
 
-import { GoogleAccount, GoogleSession } from '@/app/(auth)/google/_auth/types'
-import { regTempEmailAccount } from '@/app/(auth)/temp/_auth/options'
+import { GoogleAccount } from '@/app/(auth)/google/_auth/types'
 import { TempAccount } from '@/app/(auth)/temp/_auth/types'
 
-import { Button } from './ui/button'
+import { ThemeToggle } from './ui/themeToggle'
 
 type Props = {
   googleSession: GoogleAccount[] | null
@@ -18,7 +17,7 @@ type Props = {
 export const MainLayout = ({ googleSession, tempSession }: Props) => {
   const path = useParams()
   const mail = decodeURIComponent(path?.email as string)
-  // console.log(',,,,,', googleSession)
+  const limit = (googleSession?.length || 0) + (tempSession?.length || 0) === 6
 
   return (
     <nav className="nav_bar_container">
@@ -41,14 +40,13 @@ export const MainLayout = ({ googleSession, tempSession }: Props) => {
             <img className="h-10 w-10 rounded-full" src="/Logo/MailTm_Logo.webp" alt="" />
           </Link>
         ))}
-        <CirclePlus className="h-10 w-10"></CirclePlus>
-        {/* <ThemeToggle /> */}
-        <Link href={`/google/login`}>
-          <Button>LOG</Button>
-        </Link>
-        <form action={regTempEmailAccount} className="">
-          <Button>temp</Button>
-        </form>
+
+        {!limit && (
+          <Link href="/">
+            <CirclePlus className="h-10 w-10"></CirclePlus>
+          </Link>
+        )}
+        <ThemeToggle />
       </div>
     </nav>
   )

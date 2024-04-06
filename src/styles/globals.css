@@ -101,7 +101,7 @@
     @apply px-[10vw] xl:px-[3vw] lg:px-0;
   }
   .nav_bar_container {
-    @apply fixed left-1/2 top-8 z-999 flex h-full max-h-[54px] w-full max-w-[920px] -translate-x-1/2 -translate-y-1/2 transform items-center rounded-full bg-[rgba(0,0,0,0.2)] p-2 text-lg backdrop-blur-md;
+    @apply fixed left-1/2 top-8 z-999 flex h-full max-h-[54px] w-full max-w-[780px] -translate-x-1/2 -translate-y-1/2 transform items-center rounded-full bg-[rgba(0,0,0,0.2)] p-2 text-lg backdrop-blur-md;
   }
   .nav_icon {
     @apply flex cursor-pointer items-center justify-center rounded-lg px-2.5 py-[1px]  transition-colors  hover:bg-background/30;
