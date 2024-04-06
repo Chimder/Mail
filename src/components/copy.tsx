@@ -6,10 +6,7 @@ import { CopyToClipboard } from 'react-copy-to-clipboard'
 import toast from 'react-hot-toast'
 
 export default function CopyMail({ mail }: { mail: string }) {
-  const [copied, setCopied] = React.useState(false)
-
   const setIsCopie = () => {
-    // setCopied(true)
     toast.success('Copied', { position: 'top-left' })
   }
 
