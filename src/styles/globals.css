@@ -3,22 +3,18 @@
 @tailwind utilities;
 
 ::-webkit-scrollbar {
-  width: 4px; /* Ширина полосы прокрутки */
+  width: 4px;
 }
-
 ::-webkit-scrollbar-track {
-  background: #f1f1f1; /* Цвет фона */
+  background: #f1f1f1;
 }
-
 ::-webkit-scrollbar-thumb {
-  background: rgba(223, 221, 221, 0.3); /* Цвет ползунка с прозрачностью */
-  border-radius: 300px; /* Закругление краев ползунка */
+  background: rgba(223, 221, 221, 0.3);
+  border-radius: 300px;
 }
-
 ::-webkit-scrollbar-thumb {
-  background: #888; /* Цвет ползунка */
+  background: #888;
 }
-
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(112, 111, 111, 0.5);
 }
@@ -26,7 +22,9 @@
 @layer base {
   :root {
     --background: 0 0% 100%;
+    --background-nav: 0 0% 59%;
     --foreground: 0 0% 3.9%;
+    --nav-bg: rgb(255, 255, 255);
 
     --card: 0 0% 100%;
     --card-foreground: 0 0% 3.9%;
@@ -37,7 +35,7 @@
     --primary: 0 0% 9%;
     --primary-foreground: 0 0% 98%;
 
-    --secondary: 0 0% 96.1%;
+    --secondary: 0 0% 89%;
     --secondary-foreground: 0 0% 9%;
 
     --muted: 0 0% 96.1%;
@@ -58,7 +56,9 @@
 
   .dark {
     --background: 0 0% 3.9%;
+    --background-nav: 283 50% 7%;
     --foreground: 0 0% 98%;
+    --nav-bg: rgb(0, 0, 0);
 
     --card: 0 0% 3.9%;
     --card-foreground: 0 0% 98%;
@@ -87,6 +87,15 @@
   }
 }
 
+.nav_color {
+  filter: drop-shadow(rgba(56, 237, 172, 0.6) 10px 0px 15px)
+    drop-shadow(rgba(150, 162, 255, 0.6) -10px 0px 15px);
+  border: 1px solid transparent;
+  background:
+    linear-gradient(var(--nav-bg), var(--nav-bg)) padding-box padding-box,
+    linear-gradient(90deg, rgb(32, 28, 255) -91.5%, rgb(19, 239, 149) 80.05%) border-box border-box;
+}
+
 @layer base {
   * {
     @apply border-border;
@@ -101,13 +110,13 @@
     @apply px-[10vw] xl:px-[3vw] lg:px-0;
   }
   .nav_bar_container {
-    @apply fixed left-1/2 top-8 z-999 flex h-full max-h-[54px] w-full max-w-[780px] -translate-x-1/2 -translate-y-1/2 transform items-center rounded-full bg-[rgba(0,0,0,0.2)] p-2 text-lg backdrop-blur-md;
+    @apply bg-backgroundNav fixed  left-1/2 top-8 z-999 flex h-full max-h-[54px] w-full max-w-[780px] -translate-x-1/2 -translate-y-1/2 transform items-center rounded-full p-2 text-lg;
   }
   .nav_icon {
-    @apply flex cursor-pointer items-center justify-center rounded-lg px-2.5 py-[1px]  transition-colors  hover:bg-background/30;
+    @apply flex cursor-pointer items-center justify-center rounded-lg px-2.5 py-[1px]  transition-colors  hover:bg-secondary;
   }
   .nav_icon_active {
-    @apply relative z-100  flex items-center rounded-lg bg-background/25  px-2.5 py-[1px] font-semibold text-white opacity-90  transition-colors;
+    @apply relative z-100  flex items-center rounded-lg bg-secondary  px-2.5 py-[1px] font-semibold text-white opacity-90  transition-colors;
   }
   .spin {
     @apply fixed left-1/2 top-1/2 z-999 flex h-full max-h-[154px] w-full max-w-[200px] -translate-x-1/2 -translate-y-1/2 transform items-center rounded-full p-2 text-lg backdrop-blur-md;

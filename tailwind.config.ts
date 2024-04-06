@@ -34,6 +34,9 @@ module.exports = {
         ring: 'hsl(var(--ring))',
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
+        backgroundNav: 'hsl(var(--background-nav))',
+        // navFilter:var(--nav-filter),
+        // navBg:var(--nav-bg),
         badge: 'hsl(var(--badge))',
         primary: {
           DEFAULT: 'hsl(var(--primary))',

@@ -91,13 +91,21 @@ export default function Gmail({ accountData }: Props) {
   }
 
   return (
-    <div className="grid h-[100vh] grid-cols-5 bg-white pt-[6.8vh]">
+    <div className="grid h-[100vh] grid-cols-5 bg-background pt-[6.8vh]">
       <section className="col-span-2 flex flex-col items-center justify-start pl-[12vw] ">
         <div className="my-2 flex w-full items-center justify-evenly">
           <Button>{accountData.email}</Button>
-          <CopyMail mail={accountData.email} />
-          <RotateCw onClick={() => refetch()} className={`${isFetching ? 'animate-spin' : ''}`} />
-          <LogOut className="cursor-pointer" onClick={() => deleteGoogleMail(accountData?.email)} />
+          <div className="cursor-pointer hover:scale-110">
+            <CopyMail mail={accountData.email} />
+          </div>
+          <RotateCw
+            onClick={() => refetch()}
+            className={`cursor-pointer hover:scale-110 ${isFetching ? 'animate-spin' : ''}`}
+          />
+          <LogOut
+            className="cursor-pointer hover:scale-110"
+            onClick={() => deleteGoogleMail(accountData?.email)}
+          />
         </div>
         <div className="m-0 flex h-[87vh] w-full  flex-col items-center justify-start overflow-x-hidden overflow-y-scroll p-0">
           {mailDatas &&
@@ -105,7 +113,7 @@ export default function Gmail({ accountData }: Props) {
               <div
                 ref={ref}
                 key={`${mess.snippet} + ${i}`}
-                className={`ml-0 flex w-full cursor-pointer justify-center !pl-0 hover:bg-black/15 ${selectedMessage?.messageId == mess.messageId ? 'bg-black/20' : ''}`}
+                className={`ml-0 flex w-full cursor-pointer justify-center !pl-0 hover:bg-slate-500/25 ${selectedMessage?.messageId == mess.messageId ? 'bg-slate-500/25' : ''}`}
                 onClick={() => chooseMessage(mess)}
               >
                 <div className="flex w-full items-center justify-start divide-y divide-dashed divide-blue-200">
@@ -119,12 +127,12 @@ export default function Gmail({ accountData }: Props) {
                   <div className="w-full">
                     <div className="flex justify-between">
                       <div className="flex text-base">{mess?.from}</div>
-                      <div className="pr-1 text-sm text-black">{mess?.date}</div>
+                      <div className="text-s pr-1">{mess?.date}</div>
                     </div>
-                    <div className="line-clamp-1 w-full overflow-hidden text-ellipsis text-sm text-black/95">
+                    <div className="line-clamp-1 w-full overflow-hidden text-ellipsis text-sm">
                       {mess?.subject}
                     </div>
-                    <div className="line-clamp-2 w-full text-sm text-black/70">{mess?.snippet}</div>
+                    <div className="line-clamp-2 w-full text-sm ">{mess?.snippet}</div>
                   </div>
                 </div>
               </div>
@@ -133,7 +141,7 @@ export default function Gmail({ accountData }: Props) {
         </div>
       </section>
 
-      <section className="col-span-3 flex w-full flex-col items-center justify-center  overflow-x-hidden ">
+      <section className="col-span-3 flex w-full flex-col items-center justify-center overflow-x-hidden">
         {selectedMessage?.bodyData && /<[a-z][\s\S]*>/i.test(selectedMessage?.bodyData) ? (
           <iframe
             className="flex h-full w-full flex-col items-center justify-center overflow-x-hidden font-sans"

@@ -20,7 +20,7 @@ export const MainLayout = ({ googleSession, tempSession }: Props) => {
   const limit = (googleSession?.length || 0) + (tempSession?.length || 0) === 6
 
   return (
-    <nav className="nav_bar_container">
+    <nav className="nav_bar_container nav_color dark:nav_color_dark ">
       <div className="z-100 flex w-full justify-evenly">
         {googleSession?.map((email, i) => (
           <Link
