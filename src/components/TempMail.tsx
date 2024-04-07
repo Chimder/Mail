@@ -25,6 +25,7 @@ export default function TempMail({ accountData }: Props) {
     queryKey: ['temp', messageId],
     queryFn: () => getMessageBody(accountData.accessToken, messageId),
     refetchOnWindowFocus: false,
+    enabled: !!messageId,
     retry: 0,
   })
 
@@ -37,6 +38,7 @@ export default function TempMail({ accountData }: Props) {
     queryKey: ['temp', accountData.email],
     queryFn: () => getTempMessages(accountData.accessToken, '1'),
     refetchOnWindowFocus: false,
+    enabled: !!accountData.email,
     retry: 0,
   })
 
