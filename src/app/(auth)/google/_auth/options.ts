@@ -17,15 +17,19 @@ export async function encrypt(payload: any) {
 
 export async function decrypt(input: string): Promise<any> {
   if (!input) {
-    console.log('ERRR 18')
+    console.error('ER dECRYPT INPUT')
     return undefined
   }
-  const { payload } = await jwtVerify(input, key, {
-    algorithms: ['HS256'],
-  })
-  return payload
+  try {
+    const { payload } = await jwtVerify(input, key, {
+      algorithms: ['HS256'],
+    })
+    return payload
+  } catch (error) {
+    console.error('Error during decryption:', error);
+    return undefined;
+  }
 }
-
 export async function deleteGoogleMail(email: string) {
   cookies().delete(`googleMailer_${email}`)
   const activeAccount = await getGmailSession()

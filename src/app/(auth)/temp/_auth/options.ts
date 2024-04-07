@@ -11,24 +11,39 @@ import { TempAccount, TempMess } from './types'
 export async function getTempSession(): Promise<TempAccount[] | null> {
   const cookiesAll = cookies()
   const tempAccounts = cookiesAll.getAll().filter(cookie => cookie.name.startsWith('tempmail_'))
-  const accounts = await Promise.all(tempAccounts.map(cookie => decrypt(cookie.value)))
-  return accounts
+  if (!tempAccounts || tempAccounts.length === 0) {
+    console.error('No tempmail cookies found')
+    return null
+  }
+  const accounts = await Promise.all(
+    tempAccounts.map(cookie => {
+      if (!cookie.value) {
+        console.error('Cookie value is undefined')
+        return null
+      }
+      return decrypt(cookie.value)
+    }),
+  )
+  return accounts.filter(account => account !== null)
 }
 
 export async function regTempEmailAccount() {
   const domains = await getDomains()
-  if (!domains) {
+  if (!domains || !domains['hydra:member'] || domains['hydra:member'].length === 0) {
+    console.error('No domains available')
     return undefined
   }
+  console.log('DOMAINS', domains)
   const username = uuidv4().substring(0, 8)
   const password = uuidv4().substring(0, 12)
   const address = `${username}@${domains['hydra:member'][0].domain}`
 
   try {
-    await axios.post('https://api.mail.tm/accounts', {
+    const accountResponse = await axios.post('https://api.mail.tm/accounts', {
       address: address,
       password: password,
     })
+    console.log('ACCRESP', accountResponse)
 
     const loginResponse = await axios.post('https://api.mail.tm/token', {
       address: address,
@@ -47,8 +62,9 @@ export async function regTempEmailAccount() {
       httpOnly: true,
     })
   } catch (error) {
-    console.error(error)
+    console.error('Error during account creation or login:', error)
     redirect('/')
+    return undefined
   }
   redirect(`temp/${address}`)
 }
@@ -91,8 +107,13 @@ export async function getMessageBody(token?: string, messageId?: string) {
 async function getDomains() {
   try {
     const response = await axios.get('https://api.mail.tm/domains')
+    if (response.status !== 200) {
+      console.error('Error retrieving domains:', response.status, response.statusText)
+      return null
+    }
     return response.data
   } catch (error) {
-    console.error(error)
+    console.error('Error retrieving domains:', error)
+    return null
   }
 }
