@@ -67,27 +67,28 @@ export default function TempMail({ accountData }: Props) {
           />
         </div>
         <div className="m-0 flex h-[87vh] w-full flex-col items-center justify-start overflow-x-hidden overflow-y-scroll p-0">
-          {mess?.['hydra:member'].map((mess: HydraMember) => (
-            <div
-              key={mess.id}
-              className={`ml-0 flex w-full cursor-pointer justify-center !pl-0 hover:bg-slate-500/25 ${messageId == mess.id ? 'bg-slate-500/25' : ''}`}
-              onClick={() => setMessBody(mess.id)}
-            >
-              <div className="flex w-full items-center justify-start divide-y divide-dashed divide-blue-200">
-                <Tally1 className="h-6 w-6 pr-1 text-orange-500" />
-                <div className="w-full">
-                  <div className="flex justify-between">
-                    <div className="flex text-base">{mess?.from.name}</div>
-                    <div className="pr-1 text-sm">{formatTempDate(mess.createdAt)}</div>
+          {mess &&
+            mess?.['hydra:member']?.map((mess: HydraMember) => (
+              <div
+                key={mess.id}
+                className={`ml-0 flex w-full cursor-pointer justify-center !pl-0 hover:bg-slate-500/25 ${messageId == mess.id ? 'bg-slate-500/25' : ''}`}
+                onClick={() => setMessBody(mess.id)}
+              >
+                <div className="flex w-full items-center justify-start divide-y divide-dashed divide-blue-200">
+                  <Tally1 className="h-6 w-6 pr-1 text-orange-500" />
+                  <div className="w-full">
+                    <div className="flex justify-between">
+                      <div className="flex text-base">{mess.from.name}</div>
+                      <div className="pr-1 text-sm">{formatTempDate(mess.createdAt)}</div>
+                    </div>
+                    <div className="line-clamp-1 w-full overflow-hidden text-ellipsis text-sm">
+                      {mess.subject}
+                    </div>
+                    <div className="line-clamp-2 w-full text-sm">{mess.intro}</div>
                   </div>
-                  <div className="line-clamp-1 w-full overflow-hidden text-ellipsis text-sm">
-                    {mess?.subject}
-                  </div>
-                  <div className="line-clamp-2 w-full text-sm">{mess?.intro}</div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
         </div>
       </section>
 

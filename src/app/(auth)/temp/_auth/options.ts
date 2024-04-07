@@ -17,6 +17,9 @@ export async function getTempSession(): Promise<TempAccount[] | null> {
 
 export async function regTempEmailAccount() {
   const domains = await getDomains()
+  if (!domains) {
+    return undefined
+  }
   const username = uuidv4().substring(0, 8)
   const password = uuidv4().substring(0, 12)
   const address = `${username}@${domains['hydra:member'][0].domain}`
